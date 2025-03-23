@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Tax</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+
+        .invoice-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        /* .invoice-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7rem;
+        } */
+
+        h1 {
+            text-align: center;
+            color: #28a745;
+        }
+
+        .seller {
+            width: 45%;
+        }
+
+        .seller h3 {
+            margin-top: 0;
+            font-size: 23px;
+            font-weight: 600;
+        }
+
+        .seller p {
+            margin: 0;
+            color: #333;
+            font-weight: 500;
+            line-height: 21px;
+            letter-spacing: 1.2px;
+        }
+
+        .deller {
+            margin: 0;
+        }
+
+        .deller h3 {
+            margin-top: 2px;
+            font-size: 23px;
+            font-weight: 600;
+        }
+
+        .deller p {
+            margin: 0;
+            color: #333;
+            font-weight: 500;
+            line-height: 21px;
+            letter-spacing: 1.2px;
+        }
+
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            margin-top: 45px;
+        }
+
+        .invoice-table th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .invoice-table input {
+            width: 95%;
+            padding: 5px;
+            margin: 3px 0;
+            border: none;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .totals {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+        #date {
+            text-align: right;
+            margin: 25px 20px 0;
+            font-size: 1.05rem;
+            font-weight: bold;
+            color: #333;
+            /* text-decoration: underline; */
+        }
+        
+        /*Responsive mobile media for 786px*/
+        @media screen and (max-width: 480px) {
+            .invoice-container {
+                max-width: 100%;
+                margin: 0 auto;    
+            }
+
+            .invoice-header {
+                display: flex;
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+            .invoice-header .seller, .invoice-table {
+                width: 100%;
+            }
+            /* .invoice-header .deller {
+                width: 100%;
+                margin: 0;
+            } */
+            #date {
+                font-size: 0.9rem;
+                margin: 0 5px auto;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div class="invoice-container">
+        <h1>Invoice</h1>
+        <div id="date"></div>
+        <div class="invoice-header">
+            <div class="seller">
+                <h3>Seller:</h3>
+                <p>Neha Trading Company</p>
+                <p>Gala No. 09, Sarita ested,</p>
+                <p>Kajupada pipeline, near manisha bar,</p>
+                <p>Opp. police station,</p>
+                <p>Mumbai, Maharashtra 40072.</p>
+                <p>khansaheruddin06@gmail.com</p>
+            </div>
+            <!-- <div class="deller">
+                <h3>Deller:</h3>
+                <p>Neha Trading Company</p>
+                <p>Gala No. 09, Sarita ested,</p>
+                <p>Kajupada pipeline, near manisha bar,</p>
+                <p>Opp. police station,</p>
+                <p>Mumbai, Maharashtra 40072.</p>
+                <p>khansaheruddin06@gmail.com</p>
+            </div> -->
+        </div>
+
+        <table class="invoice-table">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Qunatity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody id="invoice-items">
+                <tr>
+                    <td><input type="text" class="description" placeholder="Item description"></td>
+                    <td><input type="number" class="quantity" value="1" min="1" onchange="calculateTotal()"></td>
+                    <td><input type="number" class="price" value="0" onchange="calculateTotal()"></td>
+                    <td><span class="item-total">0.00</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="totals">
+            <p>Subtotal: $<span id="subtotal">0.00</span></p>
+            <p>Tax(18%): $<span id="tax">0.00</span></p>
+            <p>Total: $<span id="total">0</span></p>
+        </div>
+
+        <button onclick="addItem()">Add Item</button>
+
+    </div>
+
+</body>
+
+<script>
+    // Function to calculate the totals and tax
+    function calculateTotal() {
+        let subtotal = 0;
+        let items = document.querySelectorAll('.invoice-table tbody tr');
+
+        items.forEach(item => {
+            const quantity = parseFloat(item.querySelector('.quantity').value) || 0;
+            const price = parseFloat(item.querySelector('.price').value) || 0;
+            const totalItem = quantity * price;
+            item.querySelector('.item-total').textContent = totalItem.toFixed(2);
+            subtotal += totalItem;
+        });
+
+        const taxRate = 0.18;
+        const tax = subtotal * taxRate;
+        const total = subtotal + tax;
+
+        document.getElementById('subtotal').innerText = subtotal.toFixed(2);
+        document.getElementById('tax').innerText = tax.toFixed(2);
+        document.getElementById('total').innerText = total.toFixed(2);
+    }
+
+    function addItem() {
+        const tableBody = document.getElementById('invoice-items');
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+            <td><input type="text" class="description" placeholder="Item description"></td>
+            <td><input type="number" class="quantity" value="1" min="1" onchange="calculateTotal()"></td>
+            <td><input type="number" class="price" value="0" onchange="calculateTotal()"></td>
+            <td><span class="item-total">0.00</span></td>`;
+
+        tableBody.appendChild(newRow);
+        calculateTotal();
+    }
+
+    calculateTotal();
+
+    // Current Date dipaly
+    function dateUpdate() {
+        let date = document.getElementById('date')
+        let today = new Date()
+
+        let month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep","Oct","Nov","Dec"]
+
+        let day = ["Sun", "Mon", "Tue", "Wed", "Thr", "Fri", "Sat"]
+
+        date.innerHTML = (`${day[today.getDay()]} ${today.getDate()} , ${month[today.getMonth()]} ${today.getFullYear()}`)
+    }
+    window.onload = dateUpdate 
+
+
+</script>
+
+</html>
